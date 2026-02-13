@@ -1,0 +1,88 @@
+{
+  "id": "usage-limiter",
+  "name": "Usage Limiter",
+  "description": "Enforce token, cost, and request limits with warn/block behavior and model downgrade to control costs",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "limits": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "daily": { "$ref": "#/$defs/periodLimit" },
+          "weekly": { "$ref": "#/$defs/periodLimit" },
+          "monthly": { "$ref": "#/$defs/periodLimit" }
+        },
+        "label": "Budget Limits",
+        "help": "Set token, cost, and request limits per time period. Only configured limits are enforced."
+      },
+      "warnThreshold": {
+        "type": "number",
+        "default": 0.8,
+        "minimum": 0,
+        "maximum": 1,
+        "label": "Warning Threshold",
+        "help": "Fraction of budget at which warnings appear (default: 0.8 = 80%)"
+      },
+      "blockThreshold": {
+        "type": "number",
+        "default": 1.0,
+        "minimum": 0,
+        "maximum": 2,
+        "label": "Block Threshold",
+        "help": "Fraction of budget at which requests are blocked (default: 1.0 = 100%)"
+      },
+      "timezone": {
+        "type": "string",
+        "default": "UTC",
+        "label": "Timezone",
+        "help": "IANA timezone for period boundaries (e.g., America/New_York)"
+      },
+      "fallbackModel": {
+        "type": "string",
+        "label": "Fallback Model",
+        "help": "Cheaper model to suggest/use when approaching limits (e.g., anthropic/claude-haiku-4.5)",
+        "placeholder": "anthropic/claude-haiku-4.5"
+      },
+      "autoDowngrade": {
+        "type": "boolean",
+        "default": false,
+        "label": "Auto Downgrade",
+        "help": "Automatically instruct the agent to use the fallback model at the warn threshold"
+      },
+      "dashboardEnabled": {
+        "type": "boolean",
+        "default": true,
+        "label": "Dashboard Enabled",
+        "help": "Serve the web dashboard at /plugins/usage-limiter/dashboard"
+      }
+    },
+    "$defs": {
+      "periodLimit": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tokens": {
+            "type": "number",
+            "minimum": 0,
+            "label": "Token Limit",
+            "help": "Maximum total tokens for this period"
+          },
+          "cost": {
+            "type": "number",
+            "minimum": 0,
+            "label": "Cost Limit (USD)",
+            "help": "Maximum cost in dollars for this period"
+          },
+          "requests": {
+            "type": "number",
+            "minimum": 0,
+            "label": "Request Limit",
+            "help": "Maximum number of LLM requests for this period"
+          }
+        }
+      }
+    }
+  }
+}
